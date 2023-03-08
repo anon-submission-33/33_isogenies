@@ -51,7 +51,7 @@ end for;
 
 u := 84727936279133751413846965905657949516597707407463528877;
 v := 252700408455552999199462036016877991153973776652061243550;
-//S Sanity check:
+// Sanity check:
 assert 3^238 - 10*2^372 eq (u+2*v*I)*(u-2*v*I);
 
 /*
@@ -122,7 +122,7 @@ end function;
 
 
 function eval_phi1(pt, a,b,c,d) 
-	/* evaluation of the pull-back of phi1 */
+	/* Evaluation of the pull-back of phi1 */
 	if pt[3] eq 0 then
 		return 0;
 	else 
@@ -149,7 +149,7 @@ end function;
 
 
 function eval_phi2(pt, a,b,c,d) 
-	/* evaluation of the pull-back of phi2 */
+	/* Evaluation of the pull-back of phi2 */
 	if pt[3] eq 0 then
 		return  0;
 	else 
@@ -192,8 +192,8 @@ function get_ABCD_transform(kernel,curves)
 	Delta1 := a^3+b^2;
 	Delta2 := c^3+d^2;
 	/* 
-	apply coordinate transformation x = alpha*xprime + beta and y = yprime/gamma
-	inverse is xprime = (x-beta)/alpha and yprime = gamma*y
+	Apply coordinate transformation x = alpha*xprime + beta and y = yprime/gamma
+	Inverse is xprime = (x-beta)/alpha and yprime = gamma*y
 	*/
 	newf1 := gamma1^2*Evaluate(f1, alpha1*x+beta1);
 	newf2 := gamma2^2*Evaluate(f2, alpha2*x+beta2);
@@ -204,7 +204,7 @@ function get_ABCD_transform(kernel,curves)
 	rel1 := [12*a*c + 16*b*d -1, aux1*Delta1-1, aux2*Delta2-1];
 	rel2 := Coefficients(f1_abc - newf1) cat Coefficients(f2_abc - newf2);
 	
-	/*condition on the kernel*/
+	/* Condition on the kernel*/
 	newP1 := transform_ell_point(P1,alpha1,beta1,gamma1);
 	newP2 := transform_ell_point(P2,alpha2,beta2,gamma2);
 	newQ1 := transform_ell_point(Q1,alpha1,beta1,gamma1);
@@ -353,13 +353,8 @@ function apply_transformation(transform, points, f, rst)
 	bcpad := b*c + a*d;
 
 	l0 := (-2) * (ac)^2 * (3*(bcpad)^2 - 8*abcd)*f0 + (2) * ac * (bcpad) * ((bcpad)^2 - 2*abcd)*f1 + (-4) * abcd * ((bcpad)^2 - 2*abcd) * f2 + bd * (bcpad)^3 * f3 + (-2) * (bd)^2  * (bcpad)^2* f4 + (4) * (bd)^3 * (bcpad) *f5 + (-8) * (bd)^4 *f6 ;
-	l1 := (-4) * (ac)^3 * (bcpad)*f0 + (ac)^2 * ((bcpad)^2 + 4*abcd) * f1 + (-4) * abcd*a*c * (bcpad)*f2 + abcd * ((bcpad)^2* + 4*abcd)*f3 + (-4) * ac * (bd)^2 * (bcpad)*f4 + (bd)^2 * ((bcpad)^2 + 4*abcd)* f5 + (-4) * (bd)^3 * (bcpad)*f6;
+	l1 := (-4) * (ac)^3 * (bcpad)*f0 + (ac)^2 * ((bcpad)^2 + 4*abcd) * f1 + (-4) * abcd*a*c * (bcpad)*f2 + abcd * ((bcpad)^2 + 4*abcd)*f3 + (-4) * ac * (bd)^2 * (bcpad)*f4 + (bd)^2 * ((bcpad)^2 + 4*abcd)* f5 + (-4) * (bd)^3 * (bcpad)*f6;
 	l2 := (-8) * (ac)^4 *f0 + (4) * (ac)^3 * (bcpad) *f1 + (-2) * (ac)^2 * (bcpad)^2 * f2 + ac * (bcpad)^3*f3 + (-4) * abcd * (b^2*c^2 + a^2*d^2) * f4 + (2) * bd * (bcpad) * (b^2*c^2 + a^2*d^2) * f5 + (-2) * (bd)^2 * (3*b^2*c^2 - 2*abcd + 3*a^2*d^2) * f6;
-	l1 := (-4) * (ac)^3 * (bcpad)*f0 + (ac)^2 * ((bcpad)^2 + 4*abcd) * f1 + (-4) * abcd*a*c * (bcpad)*f2 - abcd * ((bcpad)^2 + 4*abcd)*f3 + (-4) * ac * (bd)^2 * (bcpad)*f4 + (bd)^2 * ((bcpad)^2 + 4*abcd)* f5 + (-4) * (bd)^3 * (bcpad)*f6;
-
-	//l0 := -  (a^2*c^2*(6*b^2*c^2 - 4*a*b*c*d + 6*a^2*d^2)*f0  -2*a*c*(b^3*c^3 + a*b^2*c^2*d + a^2*b*c*d^2  + a^3*d^3)*f1 + 4*a*b*c*d*(b^2*c^2 + a^2*d^2)*f2 - b^4*c^3*d*f3 - a*b*d^2*(3*b^2*c^2 + 3*a*b*c*d + a^2*d^2)*f3 + 2*b^2*d^2*(bcpad)^2*f4 - 4*b^3*d^3*(b*c + a*d)*f5 + 8*b^4*d^4*f6);
-	l1 := -  (4*a^3*b*c^4*f0 + 4*a^4*c^3*d*f0 - a^2*b^2*c^4*f1 - 6*a^3*b*c^3*d*f1 - a^4*c^2*d^2*f1 + 4*a^2*b^2*c^3*d*f2 + 4*a^3*b*c^2*d^2*f2 - a*b^3*c^3*d*f3 - 6*a^2*b^2*c^2*d^2*f3 - a^3*b*c*d^3*f3 + 4*a*b^3*c^2*d^2*f4 + 4*a^2*b^2*c*d^3*f4 - b^4*c^2*d^2*f5 - 6*a*b^3*c*d^3*f5 - a^2*b^2*d^4*f5 + 4*b^4*c*d^3*f6 + 4*a*b^3*d^4*f6);
-	//l2 := -  (8*a^4*c^4*f0 - 4*a^3*b*c^4*f1 - 4*a^4*c^3*d*f1 + 2*a^2*b^2*c^4*f2 + 4*a^3*b*c^3*d*f2 + 2*a^4*c^2*d^2*f2 - a*b^3*c^4*f3 - 3*a^2*b^2*c^3*d*f3 - 3*a^3*b*c^2*d^2*f3 - a^4*c*d^3*f3 + 4*a*b^3*c^3*d*f4 + 4*a^3*b*c*d^3*f4 - 2*b^4*c^3*d*f5 - 2*a*b^3*c^2*d^2*f5 - 2*a^2*b^2*c*d^3*f5 - 2*a^3*b*d^4*f5 + 6*b^4*c^2*d^2*f6 - 4*a*b^3*c*d^3*f6 + 6*a^2*b^2*d^4*f6);
 
 	images := [];
 	for xx in points do
@@ -626,13 +621,13 @@ function get_ABCD_transform_split(f,kernel)
 	F2 := 2*d*x^3 + 3*c*x^2 + 1;
 	Fabcd := F1*F2;
 	/* 
-	apply coordinate transformation x = (alpha*xprime + beta)/(gamma*x + delta) and y = epsilon*yprime/(gamma*x+delta)^3
-	inverse is xprime = (delta*x-beta)/(alpha-gamma*x) and yprime =(alpha*delta-beta*gamma)^3 y/((-gamma*x + alpha)^3*epsilon)
+	Apply coordinate transformation x = (alpha*xprime + beta)/(gamma*x + delta) and y = epsilon*yprime/(gamma*x+delta)^3
+	Inverse is xprime = (delta*x-beta)/(alpha-gamma*x) and yprime =(alpha*delta-beta*gamma)^3 y/((-gamma*x + alpha)^3*epsilon)
 	*/
 	newf := Kx ! (epsilon*Evaluate(f, (alpha*x+beta)/(gamma*x+delta))*(gamma*x+delta)^6);
 	rel1 := [12*a*c + 16*b*d -1, aux1*Delta1-1, aux2*Delta2-1];
 	rel2 := Coefficients(newf - Fabcd);
-	/*kernel condition*/
+	/* Kernel condition*/
 	xx0 := gamma^2*x2 - gamma*alpha*x1 + alpha^2*x0;
 	xx1 := -2*delta*gamma*x2 + (beta*gamma + alpha*delta)*x1 - 2*beta*alpha*x0;
 	xx2 := delta^2*x2 - delta*beta*x1 + beta^2*x0;
@@ -642,11 +637,12 @@ function get_ABCD_transform_split(f,kernel)
 	rel3 := [xx0^2 + 4*c*(xx1^2-xx0*xx2) - 8*d*xx1*xx2, xx2^2 + 4*a*(xx1^2-xx0*xx2) - 8*b*xx0*xx1];
 	rel4 := [yy0^2 + 4*c*(yy1^2-yy0*yy2) - 8*d*yy1*yy2, yy2^2 + 4*a*(yy1^2-yy0*yy2) - 8*b*yy0*yy1];
 	relations := [Knew ! Numerator(el): el in rel1 cat rel2 cat rel3 cat rel4];
-	/*note: rel 3 and rel4 are not needed, but the GB computation is faster with the information*/
+	/*
+	Note: rel 3 and rel4 are not needed, but the GB computation is faster with the information
+	*/
     I := ideal<Knew |  relations>;
 	GB := GroebnerBasis(I);
-	c := 1; //we guess if c is a square or not.
-	//aux1,aux2,beta,gamma,delta,epsilon,a,b,c,d
+	c := 1; // We guess if c is a square or not.
 	rts := Roots(UnivariatePolynomial(Evaluate(GB[8],9,c)));
 	if #rts eq 0 then
 		c := NSQ;
@@ -723,7 +719,7 @@ function split_evaluation(kernel, points)
 	J := Parent(kernel[1]);
 	C := Curve(J);
 	f := HyperellipticPolynomials(C);
-	//note this is not the correct kernel on the Kummer, but all we need
+	// Note: this is not the correct kernel on the Kummer, but all we need.
 	coef1 := Coefficients(kernel[1][1]);
 	kernel1 := [1, -coef1[2], coef1[1],0];
 	coef2 := Coefficients(kernel[2][1]);
@@ -731,9 +727,9 @@ function split_evaluation(kernel, points)
 	A,B,C,D, transform := get_ABCD_transform_split(f, [kernel1,kernel2]);
 	a,b,c,d,e := Explode(transform);
 	F,f1,f2 := get_split_curves(A,B,C,D);
-	transform_points := apply_transformation([d,-b,-c,a,e], points, f,F); //note to self: double check the e
+	transform_points := apply_transformation([d,-b,-c,a,e], points, f,F);
 	if IsSquare(e) then
-            T := 1; //this is the twist
+            T := 1; // This is the twist.
         else
             T := e;
             f1 := Evaluate(f1, x*T)/T^3;
