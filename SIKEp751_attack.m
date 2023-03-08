@@ -732,16 +732,23 @@ function split_evaluation(kernel, points)
 	a,b,c,d,e := Explode(transform);
 	F,f1,f2 := get_split_curves(A,B,C,D);
 	transform_points := apply_transformation([d,-b,-c,a,e], points, f,F); //note to self: double check the e
-	E1 := EllipticCurve(f1);
+	if IsSquare(e) then
+            T := 1; //this is the twist
+        else
+            T := e;
+            f1 := Evaluate(f1, x*T)/T^3;
+            f2 := Evaluate(f2, x*T)/T^3;
+        end if;
+        E1 := EllipticCurve(f1);
 	E2 := EllipticCurve(f2);
 	phi1x,phi1z,phi2x,phi2z := get_splitting_maps(A,B,C,D);
 	codomain_points := [];
 	for point in transform_points do
 		pt := Eltseq(point);
 		u1 := Evaluate(phi1x,pt);
-		v1 := Evaluate(phi1z,pt);
+		v1 := T*Evaluate(phi1z,pt);
 		u2 := Evaluate(phi2x,pt);
-		v2 := Evaluate(phi2z,pt);
+		v2 := T*Evaluate(phi2z,pt);
 		Append(~codomain_points, [[u1,v1], [u2,v2]]);
 	end for;
 	return [E1,E2], codomain_points;
@@ -847,7 +854,12 @@ function attack_Alice(E_start, PB, QB, EA, phiPB, phiQB)
 		P1 := iso(P1);
 		P2 := iso(P2);
 	else "Something wrong."; end if;
-	if 2^(a-1)*P1 ne E_start ! 0 then P := P1; else P := P2; end if;
+	if 2^(a-1)*P1 ne E_start ! 0 then P := P1;
+	elif 2^(a-1)*P2 ne E_start ! 0 then P := P2;
+	elif 2^(a-2)*P1 ne E_start ! 0 then P := P1; // Can happen if we took part of dual in extending Alice's isogeny
+	elif 2^(a-2)*P2 ne E_start ! 0 then P := P2;
+	else "very strange order..."; P := P1;
+	end if;
 
 	return P;
 
@@ -860,21 +872,28 @@ function verify_attack(P,EA)
 	order := 2^a;
 	while order ne 1 do
 		local_kernel := (order div 2)*Prem;
-		E_, phiA := IsogenyFromKernel(E_, x-local_kernel[1]);
+		if local_kernel ne E_ ! 0 then
+			E_, phiA := IsogenyFromKernel(E_, x-local_kernel[1]);
+			Prem := phiA(Prem);
+		end if;
 		order div:= 2;
-		Prem := phiA(Prem);
 	end while;
 	j1 := jInvariant(EA); j2 := jInvariant(E_);
 	/*
 	If we extend by a 2-isogeny which is part of the dual, we are
 	"unlucky" but can still verify easily with the modular polynomial.
 	*/
-	class4 := ClassicalModularPolynomial(4);
-	return (j1 eq j2) or Evaluate(class4,[j1,j2]) eq 0;
+	class2 := ClassicalModularPolynomial(2);
+	isomorph := j1 eq j2;
+	two_isog := Evaluate(class2,[j1,j2]) eq 0;
+	return isomorph or two_isog;
 end function;
 
 
 
+for i := 1 to 20 do
 k_A_private, EA, phiPB, phiQB := Alices_computation(E_start, PA_pub, QA_pub, PB_pub, QB_pub);
 time P := attack_Alice(E_start, PB, QB, EA, phiPB, phiQB);
 assert verify_attack(P,EA);
+end for;
+
